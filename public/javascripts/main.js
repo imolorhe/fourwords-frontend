@@ -9,7 +9,13 @@ var app = new Vue({
     el: '#app',
     data: {
         message: 'Hello world',
+        searchTerm: '',
+        mapCenter: {
+            lat: 3.745990037918091,
+            lng: -6.389520168304443
+        },
         mapOptions: {
+            disableDefaultUI: true,
             styles: [
                 {
                     "featureType": "all",
@@ -145,11 +151,37 @@ var app = new Vue({
                     "elementType": "geometry",
                     "stylers": [
                         {
-                            "color": "#ffffff"
+                            "color": "#38f9d7"
                         }
                     ]
                 }
             ]
+        }
+    },
+    computed: {
+        mapPaths: function() {
+            return [
+                {lat: this.mapCenter.lat, lng: this.mapCenter.lng},
+                {lat: this.mapCenter.lat + .1, lng: this.mapCenter.lng},
+                {lat: this.mapCenter.lat + .1, lng: this.mapCenter.lng + .1},
+                {lat: this.mapCenter.lat, lng: this.mapCenter.lng + .1}
+            ]
+        }
+    },
+    methods: {
+        searchLocation: function() {
+            console.log(this.searchTerm);
+            fetch(`/api/search?q=${this.searchTerm}`, {
+                credentials: 'include'
+            }).catch(console.log).then(resp => resp.json()).then(data => {
+                if(data.word_map){
+                console.log('Updating map..');
+                    this.mapCenter = {
+                        lat: data.lat,
+                        lng: data.long
+                    };
+                }
+            });
         }
     }
 })

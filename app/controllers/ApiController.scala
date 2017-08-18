@@ -16,7 +16,8 @@ class ApiController @Inject() (cc: ControllerComponents, dbConfigProvider: Datab
 
   import dbConfig.profile.api._
 
-  class Mappings(tag: Tag) extends Table[(Int, Float, Float, String)](tag, "mappings") {
+  type Mapping = (Int, Float, Float, String)
+  class Mappings(tag: Tag) extends Table[Mapping](tag, "mappings") {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def pointX = column[Float]("point_x")
     def pointY = column[Float]("point_y")
@@ -27,11 +28,13 @@ class ApiController @Inject() (cc: ControllerComponents, dbConfigProvider: Datab
 
   val mappings = TableQuery[Mappings]
 
-  implicit val mappingWrites = new Writes[(Int, Float, Float, String)] {
-    def writes(mapping: (Int, Float, Float, String)) = Json.obj(
+  implicit val mappingWrites = new Writes[Mapping] {
+    def writes(mapping: Mapping) = Json.obj(
       "lat" -> mapping._2,
       "long" -> mapping._3,
-      "word_map" -> mapping._4
+      "word_map" -> mapping._4,
+      "unit_width" -> 5,
+      "unit_height" -> 5
     )
   }
 
